@@ -1,9 +1,5 @@
-// ConsoleApplication24.cpp : Defines the entry point for the console application.
-//
 #include"stdafx.h"
-
 #include "test_runner.h"
-#include "profile.h"
 
 #include <forward_list>
 #include <iterator>
@@ -21,13 +17,19 @@ public:
 	}
 
 	struct Access {
-		
+		Access(T& ref_to_value, mutex& mutex)
+			: ref_to_value(ref_to_value)
+			, guard(mutex)
+		{
+
+		}
+
 		T& ref_to_value;
 		lock_guard<mutex> guard;
 	};
 
 	Access GetAccess() {
-		return { value, lock_guard<mutex>(m) };
+		return { value, m };
 	}
 
 	const T& GetRefAccess() const {
@@ -107,7 +109,8 @@ void TestSmoke() {
 	hash_set.Add(3);
 	hash_set.Add(4);
 
-	ASSERT(hash_set.Has(3));
+	auto val = hash_set.Has(3);
+	ASSERT(val);
 	ASSERT(hash_set.Has(4));
 	ASSERT(!hash_set.Has(5));
 
