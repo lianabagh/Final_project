@@ -17,11 +17,11 @@ int main() {
 		tx->get_db().write(a + b);
 		tx->runTransactional(func, a - 1, b);
 	};
-	//
-	//auto f1 = std::async([&]()
-	//{
-	//	tx_runner.runTransactional(func, 5, 8.5);
-	//});
+
+	auto f1 = std::async([&]()
+	{
+		tx_runner.runTransactional<double>(func, 5, 8.5);
+	});
 
 	std::cout << "\nSecond test.\n Here we submit a function that throws an exception\n";
 	std::function<void(TxRunner* tx, int a, int b)> func_error = [](TxRunner* tx, int a, int b) {
@@ -31,12 +31,13 @@ int main() {
 		// Call some write method on transaction database
 		tx->get_db().write(a / b);
 	};
-	
+
 	auto f2 = std::async([&]()
 	{
-		tx_runner.runTransactional(func_error, 10, 0);
+		tx_runner.runTransactional<int>(func_error, 10, 0);
 	});
-
-	system("pause");
+	f1.get();
+	f2.get();
+	//system("pause");
 	return 0;
 }
