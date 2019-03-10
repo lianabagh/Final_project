@@ -45,12 +45,15 @@ public:
 		catch (const std::runtime_error& error)
 		{
 			iter2->second.abort();
+			map_.erase(std::this_thread::get_id());
 			std::terminate();
 		}
 		if (First_Commit == 1)
 		{
 			iter2->second.commit();
+			map_.erase(std::this_thread::get_id());
 		}
+
 	}
 
 
