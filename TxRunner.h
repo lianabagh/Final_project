@@ -22,13 +22,14 @@ public:
 	template <typename T>
 	void runTransactional(std::function<void(TxRunner* tx, int a, T b)>&  func, int a, T b)
 	{
-
+		int First_Commit = 0;
 
 
 
 		auto iter = map_.find(std::this_thread::get_id());
 		if (iter == map_.end())
 		{
+			++First_Commit;
 			std::lock_guard<std::mutex> ob(m);
 			Transaction obj(db);
 			obj.start();
@@ -38,6 +39,7 @@ public:
 		auto iter2 = map_.find(std::this_thread::get_id());
 
 		try {
+
 			func(this, a, b);
 		}
 		catch (const std::runtime_error& error)
@@ -45,10 +47,13 @@ public:
 			iter2->second.abort();
 			std::terminate();
 		}
-		iter2->second.commit();
+		if (First_Commit == 1)
+		{
+			iter2->second.commit();
+		}
 	}
 
-	
+
 private:
 	Database db;
 	std::map<std::thread::id, Transaction> map_;
