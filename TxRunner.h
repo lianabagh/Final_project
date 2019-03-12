@@ -6,6 +6,9 @@
 #include"Transaction.h"
 #include<map>
 #include<mutex>
+
+
+
 class TxRunner
 {
 public:
@@ -20,18 +23,16 @@ public:
 		return db;
 	}
 	template <typename T>
-	void runTransactional(std::function<void(TxRunner* tx, int a, T b)>&  func, int a, T b)
+	void runTransactional(std::function<void(TxRunner* tx, int a, T b, Func_Name type)>&  func, int a, T b)
 	{
 		int First_Commit = 0;
-
-
 
 		auto iter = map_.find(std::this_thread::get_id());
 		if (iter == map_.end())
 		{
 			++First_Commit;
 			std::lock_guard<std::mutex> ob(m);
-			Transaction obj(db);
+			Transaction obj(db, Read);
 			obj.start();
 			map_.insert({ std::this_thread::get_id(),obj });
 		}
@@ -40,7 +41,7 @@ public:
 
 		try {
 
-			func(this, a, b);
+			func(this, a, b, iter2->second.GetType());
 		}
 		catch (const std::runtime_error& error)
 		{

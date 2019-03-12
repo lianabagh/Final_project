@@ -1,5 +1,9 @@
 #pragma once
 #include<vector>
+enum Func_Name
+{
+	Read, Write
+};
 class Database
 {
 
@@ -14,8 +18,14 @@ public:
 	{
 
 	}
-	void write(int value)
+	void write(Func_Name type, int value)
 	{
+		if (type == Read)
+			throw std::runtime_error("Write during a Read transaction");
 		vec.push_back(value);
+	}
+	int read()
+	{
+		return  vec[0];
 	}
 };

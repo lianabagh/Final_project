@@ -1,10 +1,12 @@
 #pragma once
 #include"Database.h"
 #include<iostream>
+
 class Transaction {
 public:
-	Transaction(Database& db)
+	Transaction(Database& db, Func_Name type = Write)
 		:db(db)
+		, type(type)
 	{
 
 	}
@@ -15,13 +17,13 @@ public:
 	}
 	~Transaction()
 	{
-		
+
 	}
 
-	
+
 	void start()
 	{
-		std::cout << "Transaction started" << std::endl; 
+		std::cout << "Transaction started" << std::endl;
 	}
 
 
@@ -29,10 +31,14 @@ public:
 	{
 		std::cout << "Transaction commited" << std::endl;
 	}
-
+	Func_Name GetType()
+	{
+		return type;
+	}
 	void abort()
 	{
 		std::cout << "Transaction aborted " << std::endl;
 	}
 private: Database db;
+		 Func_Name type;
 };
